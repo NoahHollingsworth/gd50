@@ -13,3 +13,14 @@ Projects completed for Harvard's [CS50 Introduction to Game Development](https:/
   
 ### Projects
 * [Pong](https://github.com/NoahHollingsworth/gd50/pong)
+
+## Lecture 1: Flappy Bird
+* Images (Sprites)
+* Infinite Scrolling
+* “Games Are Illusions”
+* Procedural Generation
+* State Machines
+* Mouse Input
+
+### Projects
+* [Flappy Bird](https://github.com/NoahHollingsworth/gd50/flappy)
