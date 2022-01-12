@@ -183,6 +183,7 @@ function push:applyShaders(canvas, shaders)
 end
 
 function push:finish(shader)
+---@diagnostic disable-next-line: deprecated
   love.graphics.setBackgroundColor(unpack(self._borderColor))
   if self._canvas then
     local _render = self:getCanvasTable("_render")
