@@ -43,6 +43,8 @@ function PlayState:enter(params)
     self.extraBalls = {self.ball}
     self.ballcount = 1
 
+    --track score for upgrading paddle size
+    self.pointsToUpgrade = 0
 
 end
 
@@ -124,6 +126,15 @@ function PlayState:update(dt)
 
                 -- add to score
                 self.score = self.score + (brick.tier * 200 + brick.color * 25)
+                -- if pointsToUpgrade is hit, increase the size of the paddle
+                print(self.pointsToUpgrade)
+                if self.paddle.size < 4 then --stop tracking pointsToUpgrade if paddle is max size
+                    self.pointsToUpgrade = self.pointsToUpgrade + (brick.tier * 200 + brick.color * 25)
+                    if self.pointsToUpgrade > 100 then 
+                        self.paddle:resize(1)
+                        self.pointsToUpgrade = 0
+                    end 
+                end 
 
                 -- trigger the brick's hit function, which removes it from play
                 brick:hit()
@@ -212,18 +223,23 @@ end
             self.extraBalls[k] = nil
             ball.inPlay = false
             self.ballcount = self.ballcount - 1
-            ball.y = -999
+            ball.y = 1
             ball.dy = 0
             ball.dx = 0
             print(ball)
         end 
         --if all the balls have fallen, decrease health
         if self.ballcount == 0 then 
-            print(self.health)
             self.health = self.health - 1
             gSounds['hurt']:play()
             --reset ballcount for next time
             self.ballcount = 1
+            --decrease size of paddle
+            print(self.paddle.size)
+            if self.paddle.size > 1 then 
+                self.paddle:resize(-1)
+            end 
+            print(self.paddle.size)
             -- if health is 0, game over 
             if self.health == 0 then
                 gStateMachine:change('game-over', {

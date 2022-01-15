@@ -20,8 +20,12 @@ Paddle = Class{}
     of the world horizontally, toward the bottom.
 ]]
 function Paddle:init(skin)
+    -- the variant is which of the four paddle sizes we currently are; 2
+    -- is the starting size, as the smallest is too tough to start with
+    self.size = 2
+
     -- x is placed in the middle
-    self.x = VIRTUAL_WIDTH / 2 - 32
+    self.x = VIRTUAL_WIDTH / 2 - (16 * self.size)
 
     -- y is placed a little above the bottom edge of the screen
     self.y = VIRTUAL_HEIGHT - 32
@@ -37,10 +41,19 @@ function Paddle:init(skin)
     -- into the gPaddleSkins table later
     self.skin = skin
 
-    -- the variant is which of the four paddle sizes we currently are; 2
-    -- is the starting size, as the smallest is too tough to start with
-    self.size = 2
+    
 end
+
+-- Change the size of the paddle based on health and score
+-- Positive size increases paddle, negative size decreases
+function Paddle:resize(size)
+    if self.size >= 1 and self.size < 5 then 
+        self.size = self.size + size 
+    end 
+
+    self.width = self.width + (size * 32)
+
+end 
 
 function Paddle:update(dt)
     -- keyboard input
