@@ -3,6 +3,7 @@
 Projects completed for Harvard's [CS50 Introduction to Game Development](https://cs50.harvard.edu/games/2018/) course. 
 
 ## Lecture 0: Pong 
+### Topics:
 * Intro to Lua and LÖVE2D
 * Drawing Shapes and Text
 * DeltaTime and Velocity
@@ -11,10 +12,11 @@ Projects completed for Harvard's [CS50 Introduction to Game Development](https:/
 * Box Collision (Hitboxes)
 * Sound Effects (with bfxr)
   
-### Projects
-* [Pong](https://github.com/NoahHollingsworth/gd50/pong)
+### Project
+* [Pong](https://github.com/NoahHollingsworth/gd50/tree/main/pong)
 
 ## Lecture 1: Flappy Bird
+### Topics: 
 * Images (Sprites)
 * Infinite Scrolling
 * “Games Are Illusions”
@@ -22,5 +24,20 @@ Projects completed for Harvard's [CS50 Introduction to Game Development](https:/
 * State Machines
 * Mouse Input
 
-### Projects
-* [Flappy Bird](https://github.com/NoahHollingsworth/gd50/flappy)
+### Project
+* [Flappy Bird](https://github.com/NoahHollingsworth/gd50/tree/main/flappy)
+
+## Lecture 2: Breakout
+
+### Topics: 
+* Sprite Sheets
+* Procedural Layouts
+* Managing State
+* Levels
+* Player Health
+* Particle Systems
+* Collision Detection Revisited
+* Persistent Save Data
+
+### Project 
+* [Breakout](https://github.com/NoahHollingsworth/gd50/tree/main/breakout)
