@@ -78,6 +78,11 @@ function Brick:init(x, y)
 
     -- spread of particles; normal looks more natural than uniform
     self.psystem:setEmissionArea('normal', 10, 10)
+
+    --specific type of brick 
+    --'normal' for regular bricks
+    --'locked' for specical locked bricks
+    self.type = 'normal' 
 end
 
 --[[
@@ -135,11 +140,15 @@ end
 
 function Brick:render()
     if self.inPlay then
-        love.graphics.draw(gTextures['main'], 
-            -- multiply color by 4 (-1) to get our color offset, then add tier to that
-            -- to draw the correct tier and color brick onto the screen
-            gFrames['bricks'][1 + ((self.color - 1) * 4) + self.tier],
-            self.x, self.y)
+        if self.type == 'normal' then 
+            love.graphics.draw(gTextures['main'], 
+                -- multiply color by 4 (-1) to get our color offset, then add tier to that
+                -- to draw the correct tier and color brick onto the screen
+                gFrames['bricks'][1 + ((self.color - 1) * 4) + self.tier],
+                self.x, self.y)
+        elseif self.type == 'locked' then
+            love.graphics.draw(gTextures['main'], gFrames['keybrick'][1], self.x, self.y)
+        end 
     end
 end
 

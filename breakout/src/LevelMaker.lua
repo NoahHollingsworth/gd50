@@ -33,6 +33,9 @@ LevelMaker = Class{}
 function LevelMaker.createMap(level)
     local bricks = {}
 
+    --track locked bricks
+    local lockedBrickCount = 0
+
     -- randomly choose the number of rows
     local numRows = math.random(1, 5)
 
@@ -110,6 +113,18 @@ function LevelMaker.createMap(level)
             if not alternatePattern then
                 b.color = solidColor
                 b.tier = solidTier
+            end 
+
+            -- add in locked bricks
+            if lockedBrickCount < 3 then 
+                if math.random(1, 2) == 1 then 
+                    b.type = 'locked'
+                    b.color = 1
+                    b.tier = 0
+                    lockedBrickCount = lockedBrickCount + 1
+                else 
+                    b.type = 'normal'
+                end 
             end 
 
             table.insert(bricks, b)

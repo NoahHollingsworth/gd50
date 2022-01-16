@@ -6,16 +6,22 @@ function Powerup:init()
     self.height = 16
 
     -- track velocity on Y axis (the only dimension the powerups will move)
-    self.dy = 30
+    self.dy = POWERUP_SPEED
 
     self.x = math.random(0, VIRTUAL_WIDTH - 16)
     self.y = 0
     
 
     -- represents the texture that will be applied to the powerup
-    self.skin = math.random(10)
+    --9 = addBalls, 10 = key
+    self.skinOptions = {9,9,9,9,10} --TODO: better way to get weighted choice
+    self.skin = self.skinOptions[math.random(5)]
     self.inPlay = false 
-
+    if self.skin == 10 then 
+        self.type = 'key'
+    else 
+        self.type = 'addballs'
+    end 
     
 end 
 
@@ -57,6 +63,11 @@ end
 function Powerup:reset()
     self.x = math.random(0, VIRTUAL_WIDTH - 16)
     self.y = 0
-    self.skin = math.random(10)
+    self.skin = self.skinOptions[math.random(5)]
+    if self.skin == 10 then 
+        self.type = 'key'
+    else 
+        self.type = 'addballs'
+    end 
     self.inPlay = false 
 end 

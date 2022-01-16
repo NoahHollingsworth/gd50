@@ -45,6 +45,7 @@ function PlayState:enter(params)
 
     --track score for upgrading paddle size
     self.pointsToUpgrade = 0
+    self.hasKey = false 
 
 end
 
@@ -64,7 +65,7 @@ function PlayState:update(dt)
 
     --track timer for spawning powerup 
     self.powerupTimer = self.powerupTimer + dt 
-    if self.powerupTimer > 1 then 
+    if self.powerupTimer > MIN_POWERUP_TIMER + math.random(0,5) then 
         --self.powerup.inPlay = true 
         self.powerup.inPlay = true 
         --self.powerupTimer = 0
@@ -75,25 +76,32 @@ function PlayState:update(dt)
     if self.powerup.inPlay then 
         self.powerup:update(dt)
     end 
-    -- if paddle hits a powerup, spawn 2 balls, 
-    -- and add them to the extraBalls table, increase ballcount
-    if self.powerup:collides(self.paddle) then 
+    -- If paddle hits a powerup, check what kind of powerup it is,
+    -- and implement it 
+
+    if self.powerup:collides(self.paddle) then
         self.powerup.inPlay = false
-        extra1 = Ball(1)
-        extra1.dx = math.random(-200, 200)
-        extra1.dy = math.random(-50, -60)
-        extra1.x = 100
-        extra1.y = 100
-        extra2 = Ball(7)
-        extra2.dx = math.random(-200, 200)
-        extra2.dy = math.random(-50, -60)
-        extra2.x = 100
-        extra2.y = 100
-        table.insert(self.extraBalls, extra1)
-        table.insert(self.extraBalls, extra2)
-        table.insert(self.extraBalls, extra1)
-        table.insert(self.extraBalls, extra1)
-        self.ballcount = self.ballcount + 2
+        -- if it is type 'addballs', spawn 2 extra balls
+        if self.powerup.type == 'addballs' then
+            extra1 = Ball(1)
+            extra1.dx = math.random(-200, 200)
+            extra1.dy = math.random(-50, -60)
+            extra1.x = self.paddle.x + (self.paddle.width / 2) - 4
+            extra1.y = self.paddle.y - 8
+            extra2 = Ball(7)
+            extra2.dx = math.random(-200, 200)
+            extra2.dy = math.random(-50, -60)
+            extra2.x = self.paddle.x + (self.paddle.width / 2) - 4
+            extra2.y = self.paddle.y - 8
+            table.insert(self.extraBalls, extra1)
+            table.insert(self.extraBalls, extra2)
+            table.insert(self.extraBalls, extra1)
+            table.insert(self.extraBalls, extra1)
+            self.ballcount = self.ballcount + 2
+        -- if it is type 'key' allow the ball to brick locked bricks
+        elseif self.powerup.type == 'key' then
+            self.hasKey = true
+        end 
     end 
     for k, ball in pairs(self.extraBalls) do 
         if ball:collides(self.paddle) then
@@ -127,7 +135,6 @@ function PlayState:update(dt)
                 -- add to score
                 self.score = self.score + (brick.tier * 200 + brick.color * 25)
                 -- if pointsToUpgrade is hit, increase the size of the paddle
-                print(self.pointsToUpgrade)
                 if self.paddle.size < 4 then --stop tracking pointsToUpgrade if paddle is max size
                     self.pointsToUpgrade = self.pointsToUpgrade + (brick.tier * 200 + brick.color * 25)
                     if self.pointsToUpgrade > 100 then 
@@ -137,7 +144,11 @@ function PlayState:update(dt)
                 end 
 
                 -- trigger the brick's hit function, which removes it from play
-                brick:hit()
+                if brick.type == 'normal' then 
+                    brick:hit()
+                elseif brick.type == 'locked' and self.hasKey then 
+                    brick:hit()
+                end 
 
                 -- if we have enough points, recover a point of health
                 if self.score > self.recoverPoints then
@@ -226,7 +237,6 @@ end
             ball.y = 1
             ball.dy = 0
             ball.dx = 0
-            print(ball)
         end 
         --if all the balls have fallen, decrease health
         if self.ballcount == 0 then 
@@ -235,11 +245,9 @@ end
             --reset ballcount for next time
             self.ballcount = 1
             --decrease size of paddle
-            print(self.paddle.size)
             if self.paddle.size > 1 then 
                 self.paddle:resize(-1)
             end 
-            print(self.paddle.size)
             -- if health is 0, game over 
             if self.health == 0 then
                 gStateMachine:change('game-over', {
