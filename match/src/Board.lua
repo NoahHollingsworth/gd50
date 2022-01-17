@@ -13,10 +13,12 @@
 
 Board = Class{}
 
-function Board:init(x, y)
+function Board:init(x, y, level)
     self.x = x
     self.y = y
     self.matches = {}
+    -- default 1 if no level is given 
+    self.level = level or 1 
 
     self:initializeTiles()
 end
@@ -25,22 +27,18 @@ function Board:initializeTiles()
     self.tiles = {}
 
     for tileY = 1, 8 do
-        
         -- empty table that will serve as a new row
         table.insert(self.tiles, {})
-
         for tileX = 1, 8 do
-            
-            -- create a new tile at X,Y with a random color and variety
-            table.insert(self.tiles[tileY], Tile(tileX, tileY, math.random(18), math.random(6)))
+            -- create a new tile at X,Y with a random color  and variety (up to the current level)
+            table.insert(self.tiles[tileY], Tile(tileX, tileY, math.random(18), math.random(math.min(6, self.level))))
         end
-    end
-
+    end 
     while self:calculateMatches() do
-        
-        -- recursively initialize if matches were returned so we always have
-        -- a matchless board on start
-        self:initializeTiles()
+            
+            -- recursively initialize if matches were returned so we always have
+            -- a matchless board on start
+            self:initializeTiles()
     end
 end
 
@@ -240,7 +238,7 @@ function Board:getFallingTiles()
             if not tile then
 
                 -- new tile with random color and variety
-                local tile = Tile(x, y, math.random(18), math.random(6))
+                local tile = Tile(x, y, math.random(18), math.random(math.min(6, self.level)))
                 tile.y = -32
                 self.tiles[y][x] = tile
 

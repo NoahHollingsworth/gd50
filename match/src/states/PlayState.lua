@@ -61,8 +61,7 @@ function PlayState:enter(params)
     self.level = params.level
 
     -- spawn a board and place it toward the right
-    self.board = params.board or Board(VIRTUAL_WIDTH - 272, 16)
-
+    self.board = Board(VIRTUAL_WIDTH - 272, 16, self.level) --params.board or 
     -- grab score from params if it was passed
     self.score = params.score or 0
 
@@ -193,9 +192,16 @@ function PlayState:calculateMatches()
         gSounds['match']:stop()
         gSounds['match']:play()
         local extraSeconds = 0
-        -- add score and extra time for each match
+        -- add score
         for k, match in pairs(matches) do
-            self.score = self.score + #match * 50
+            local tempScore = 0
+            -- add up scores based on which tiles were in the match
+            for j, tempTile in pairs(match) do 
+                tempScore = tempScore + (tempTile.variety * 50)
+            end 
+            -- add the score for the match to the total score
+            self.score = self.score + tempScore
+            -- add extra time for the match
             extraSeconds = extraSeconds + #match
         end
         self.timer = self.timer + extraSeconds
