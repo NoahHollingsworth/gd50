@@ -174,6 +174,13 @@ function PlayState:update(dt)
     end
 
     Timer.update(dt)
+    for y = 1, #self.board.tiles do
+        for x = 1, #self.board.tiles[1] do
+            if self.board.tiles[y][x].shiny then 
+                self.board.tiles[y][x]:update(dt)
+            end 
+        end
+    end
 end
 
 --[[

@@ -13,7 +13,7 @@
 
 Tile = Class{}
 
-function Tile:init(x, y, color, variety)
+function Tile:init(x, y, color, variety, shiny)
     
     -- board positions
     self.gridX = x
@@ -26,7 +26,22 @@ function Tile:init(x, y, color, variety)
     -- tile appearance/points
     self.color = color
     self.variety = variety
+
+    -- is this a shiny block, default to false
+    self.shiny = shiny or false 
+
+    self.psystem = love.graphics.newParticleSystem(gTextures['particle'], 300)
+    self.psystem:setParticleLifetime(0.75)
+    self.psystem:setEmissionArea('uniform', 16, 16)
+    self.psystem:setEmissionRate(10)
+    self.psystem:setColors(1,0,0,0.5, 0,0,1,0.5, 0,1,0,0.5)
+
+
 end
+
+function Tile:update(dt)
+    self.psystem:update(dt)
+end 
 
 function Tile:render(x, y)
     
@@ -39,4 +54,9 @@ function Tile:render(x, y)
     love.graphics.setColor(1, 1, 1, 1)
     love.graphics.draw(gTextures['main'], gFrames['tiles'][self.color][self.variety],
         self.x + x, self.y + y)
+    
+    if self.shiny then 
+        love.graphics.setColor(1,1,1,1)
+        love.graphics.draw(self.psystem, self.x + x + 16, self.y + y + 16, 0, 0.5, 0.5)
+    end 
 end
