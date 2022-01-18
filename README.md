@@ -16,7 +16,7 @@ Projects completed for Harvard's [CS50 Introduction to Game Development](https:/
 * [Pong](https://github.com/NoahHollingsworth/gd50/tree/main/pong)
 
 ## Lecture 1: Flappy Bird
-### Topics: 
+### Topics
 * Images (Sprites)
 * Infinite Scrolling
 * “Games Are Illusions”
@@ -29,7 +29,7 @@ Projects completed for Harvard's [CS50 Introduction to Game Development](https:/
 
 ## Lecture 2: Breakout
 
-### Topics: 
+### Topics
 * Sprite Sheets
 * Procedural Layouts
 * Managing State
@@ -41,3 +41,16 @@ Projects completed for Harvard's [CS50 Introduction to Game Development](https:/
 
 ### Project 
 * [Breakout](https://github.com/NoahHollingsworth/gd50/tree/main/breakout)
+
+## Lecture 3: Match 3 
+
+### Topics 
+* Anonymous Functions
+* Tweening
+* Timers
+* Solving Matches
+* Procedural Grids
+* Sprite Art and Palettes
+
+### Project 
+* [Match 3](https://github.com/NoahHollingsworth/gd50/tree/main/match)
