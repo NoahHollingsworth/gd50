@@ -44,6 +44,8 @@ VIRTUAL_HEIGHT = 288
 -- speed at which our background texture will scroll
 BACKGROUND_SCROLL_SPEED = 80
 
+-- color tiles that will be used
+COLORS = {1, 4, 6, 9, 11, 12, 14, 17}
 function love.load()
     
     -- window bar title

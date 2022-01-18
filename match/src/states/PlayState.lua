@@ -39,6 +39,7 @@ function PlayState:init()
     self.score = 0
     self.timer = 60
 
+    self.reshuffleLabelY = -64
     -- set our Timer class to turn cursor highlight on and off
     Timer.every(0.5, function()
         self.rectHighlighted = not self.rectHighlighted
@@ -66,13 +67,29 @@ function PlayState:enter(params)
     self.score = params.score or 0
 
     -- score we have to reach to get to the next level
-    self.scoreGoal = self.level * 1.25 * 1000
+    self.scoreGoal = self.level * 1.5 * 1000
 end
 
 function PlayState:update(dt)
     if love.keyboard.wasPressed('escape') then
         love.event.quit()
     end
+    --check for possible matches
+    --if none, reshuffle the board
+    if not self.board:possibleMatches() then 
+        Timer.tween(0.25, {
+            [self] = {reshuffleLabelY = VIRTUAL_HEIGHT / 2 - 8}
+        })
+
+        :finish(function()
+            Timer.after(1, function()
+                Timer.tween(0.25, {
+                    [self] = {reshuffleLabelY = VIRTUAL_HEIGHT + 30 }
+                })
+            end)
+            self.board:initializeTiles()
+        end)
+    end 
 
     -- go back to start if time runs out
     if self.timer <= 0 then
@@ -147,7 +164,6 @@ function PlayState:update(dt)
                 local tempY = self.highlightedTile.gridY
 
                 local newTile = self.board.tiles[y][x]
-
                 self.highlightedTile.gridX = newTile.gridX
                 self.highlightedTile.gridY = newTile.gridY
                 newTile.gridX = tempX
@@ -158,22 +174,42 @@ function PlayState:update(dt)
                     self.highlightedTile
 
                 self.board.tiles[newTile.gridY][newTile.gridX] = newTile
-
                 -- tween coordinates between the two so they swap
-                Timer.tween(0.1, {
-                    [self.highlightedTile] = {x = newTile.x, y = newTile.y},
-                    [newTile] = {x = self.highlightedTile.x, y = self.highlightedTile.y}
-                })
-                
-                -- once the swap is finished, we can tween falling blocks as needed
-                :finish(function()
-                    self:calculateMatches()
-                end)
+                if self.board:calculateMatches() then 
+                    Timer.tween(0.1, {
+                        [self.highlightedTile] = {x = newTile.x, y = newTile.y},
+                        [newTile] = {x = self.highlightedTile.x, y = self.highlightedTile.y}
+                    })
+                    
+                    -- once the swap is finished, we can tween falling blocks as needed
+                    :finish(function()
+                        self:calculateMatches()
+                    end)
+                end 
+                if not self.board:calculateMatches() then  
+                    local firstX = newTile.gridX
+                    local firstY = newTile.gridY 
+
+                    local firstTile = self.board.tiles[y][x]
+                    newTile.gridX = self.highlightedTile.gridX
+                    newTile.gridY = self.highlightedTile.gridY
+
+                    self.highlightedTile.gridX = firstX 
+                    self.highlightedTile.gridY = firstY
+
+                    self.board.tiles[self.highlightedTile.gridY][self.highlightedTile.gridX] =
+                    self.highlightedTile
+
+                    self.board.tiles[newTile.gridY][newTile.gridX] = newTile
+                    gSounds['error']:play()
+                    self.highlightedTile = nil 
+                end 
             end
         end
     end
 
     Timer.update(dt)
+    --Call Tile:update for the shiny tiles
     for y = 1, #self.board.tiles do
         for x = 1, #self.board.tiles[1] do
             if self.board.tiles[y][x].shiny then 
@@ -204,7 +240,7 @@ function PlayState:calculateMatches()
             local tempScore = 0
             -- add up scores based on which tiles were in the match
             for j, tempTile in pairs(match) do 
-                tempScore = tempScore + (tempTile.variety * 50)
+                tempScore = tempScore + (tempTile.variety * 25)
             end 
             -- add the score for the match to the total score
             self.score = self.score + tempScore
@@ -274,4 +310,11 @@ function PlayState:render()
     love.graphics.printf('Score: ' .. tostring(self.score), 20, 52, 182, 'center')
     love.graphics.printf('Goal : ' .. tostring(self.scoreGoal), 20, 80, 182, 'center')
     love.graphics.printf('Timer: ' .. tostring(self.timer), 20, 108, 182, 'center')
+    
+    love.graphics.setColor(95/255, 205/255, 228/255, 200/255)
+    love.graphics.rectangle('fill', 0, self.reshuffleLabelY - 8, VIRTUAL_WIDTH, 48)
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.setFont(gFonts['large'])
+    love.graphics.printf('NO MOVES - RESHUFFLING',
+        0, self.reshuffleLabelY, VIRTUAL_WIDTH, 'center')
 end

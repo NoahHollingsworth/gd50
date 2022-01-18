@@ -32,7 +32,7 @@ function Board:initializeTiles()
         for tileX = 1, 8 do
             -- create a new tile at X,Y with a random color  and variety (up to the current level)
             local isShiny = math.random(10) == 1
-            table.insert(self.tiles[tileY], Tile(tileX, tileY, math.random(18), math.random(math.min(6, self.level)), isShiny))
+            table.insert(self.tiles[tileY], Tile(tileX, tileY, COLORS[math.random(#COLORS)], math.random(math.min(6, self.level)), isShiny))
         end
     end 
     while self:calculateMatches() do
@@ -253,9 +253,9 @@ function Board:getFallingTiles()
 
             -- if the tile is nil, we need to add a new one
             if not tile then
-
+                local isShiny = math.random(15) == 1
                 -- new tile with random color and variety
-                local tile = Tile(x, y, math.random(18), math.random(math.min(6, self.level)))
+                local tile = Tile(x, y, COLORS[math.random(#COLORS)], math.random(math.min(6, self.level)), isShiny)
                 tile.y = -32
                 self.tiles[y][x] = tile
 
@@ -269,6 +269,72 @@ function Board:getFallingTiles()
 
     return tweens
 end
+
+function Board:possibleMatches() 
+    for y = 1, 8 do 
+        for x = 1, 8 do
+            local currTile = self.tiles[y][x]
+            local neighbors = {}
+            -- get tile below currTile 
+            if y < 8 then 
+                table.insert(neighbors, self.tiles[y + 1][x])
+            end
+            -- get tile to the right of currTile
+            if x < 8 then 
+                table.insert(neighbors, self.tiles[y][x + 1])
+            end 
+
+            for k, neighbor in pairs(neighbors) do 
+                -- swap grid positions of tiles
+                local tempX = currTile.gridX 
+                local tempY = currTile.gridY
+                
+                currTile.gridX = neighbor.gridX
+                currTile.gridY = neighbor.gridY 
+
+                neighbor.gridX = tempX 
+                neighbor.gridY = tempY 
+
+                --swap tiles in the tiles table 
+                self.tiles[currTile.gridY][currTile.gridX] = currTile
+                self.tiles[neighbor.gridY][neighbor.gridX] = neighbor
+                
+                if self:calculateMatches() then 
+                    --revert the swap 
+                    local firstX = neighbor.gridX 
+                    local firstY = neighbor.gridY
+                    
+                    neighbor.gridX = currTile.gridX 
+                    neighbor.gridY = currTile.gridY
+
+                    currTile.gridX = firstX 
+                    currTile.gridY = firstY 
+
+                    self.tiles[currTile.gridY][currTile.gridX] = currTile
+                    self.tiles[neighbor.gridY][neighbor.gridX] = neighbor
+                    --there is at least one possible match, no need to keep checking
+                    return true 
+                else
+                    --revert the swap 
+                    local firstX = neighbor.gridX 
+                    local firstY = neighbor.gridY
+                    
+                    neighbor.gridX = currTile.gridX 
+                    neighbor.gridY = currTile.gridY
+
+                    currTile.gridX = firstX 
+                    currTile.gridY = firstY 
+
+                    self.tiles[currTile.gridY][currTile.gridX] = currTile
+                    self.tiles[neighbor.gridY][neighbor.gridX] = neighbor
+                    -- Didn't find a possible match, so continue
+                end  
+            end 
+        end
+    end 
+    --no matches were found 
+    return false 
+end 
 
 function Board:render()
     for y = 1, #self.tiles do
