@@ -7,10 +7,11 @@
 
 PlayState = Class{__includes = BaseState}
 
+levelWidth = 100
 function PlayState:init()
     self.camX = 0
     self.camY = 0
-    self.level = LevelMaker.generate(100, 10)
+    self.level = LevelMaker.generate(levelWidth, 10)
     self.tileMap = self.level.tileMap
     self.background = math.random(3)
     self.backgroundX = 0
@@ -135,3 +136,12 @@ function PlayState:spawnEnemies()
         end
     end
 end
+
+--Carry score over to next level
+--Increase width of the next level
+function PlayState:enter(params)
+    if params then 
+        levelWidth = params.width + 20 
+        self.player.score = params.score 
+    end 
+end 

@@ -22,6 +22,16 @@ function LevelMaker.generate(width, height)
     local tileset = math.random(20)
     local topperset = math.random(20)
 
+    -- spawn our key and lock
+    local key_id = math.random(4)
+    local keySpawned = false 
+    local keyPickup = false 
+    local lockSpawned = false 
+
+    -- TODO: randomize flag and key/lock colors
+    -- TODO: animate flag 
+    -- TODO: don't allow flags to spawn over empty space
+
     -- insert blank tables into tiles for later access
     for x = 1, height do
         table.insert(tiles, {})
@@ -37,8 +47,8 @@ function LevelMaker.generate(width, height)
                 Tile(x, y, tileID, nil, tileset, topperset))
         end
 
-        -- chance to just be emptiness
-        if math.random(7) == 1 then
+        -- chance to just be emptiness, only if it's not the first column (where the player spawns)
+        if math.random(7) == 1 and x ~= 1 then
             for y = 7, height do
                 table.insert(tiles[y],
                     Tile(x, y, tileID, nil, tileset, topperset))
@@ -74,6 +84,7 @@ function LevelMaker.generate(width, height)
                         }
                     )
                 end
+                
                 
                 -- pillar tiles
                 tiles[5][x] = Tile(x, 5, tileID, topper, tileset, topperset)
@@ -131,7 +142,7 @@ function LevelMaker.generate(width, height)
                                         height = 16,
                                         frame = math.random(#GEMS),
                                         collidable = true,
-                                        consumable = true,
+                                        consumable = true, 
                                         solid = false,
 
                                         -- gem has its own function to add to the player's score
@@ -158,6 +169,95 @@ function LevelMaker.generate(width, height)
                     }
                 )
             end
+            local keyFrame = math.random(#KEYS)
+            -- chance to spawn key, if one hasn't already spawned
+            if math.random(25) == 1 and not keySpawned and x > 10 then 
+                keyObj = GameObject {
+                    texture = 'keys-locks',
+                    x = (x - 1) * TILE_SIZE,
+                    y = (blockHeight +1 ) * TILE_SIZE,
+                    width = 16, 
+                    height = 16, 
+                    frame = math.random(4),
+                    collidable = true, 
+                    consumable = true, 
+                    solid = false, 
+                    --when the key is picked up, set keyPickup to true 
+                    onConsume = function (player, object)
+                        gSounds['pickup']:play()
+                        keyPickup = true 
+                        print(keyPickup)
+                    end
+                }
+            table.insert(objects, keyObj)
+            keySpawned = true 
+            end 
+            --chance to spawn locked block 
+            if math.random(10) == 1 and keySpawned and x > 20 and not lockSpawned then 
+                local lockObj = GameObject {
+                    texture = 'keys-locks',
+                    x = (x - 1) * TILE_SIZE,
+                    y = (blockHeight -1 ) * TILE_SIZE,
+                    width = 16, 
+                    height = 16, 
+                    frame = keyObj.frame + 4, --get the same color lock as the key that already spawned
+                    collidable = true, 
+                    solid = true, 
+                    hit = false,
+                    --the lock is hit, unlock it only if the key has been picked up
+                    onCollide = function (obj)
+                        -- After the lock is unlocked, spawn the flag (pole and flag)
+                        if keyPickup and not obj.hit then
+                            obj.hit = true 
+                            gSounds['powerup-reveal']:play()
+                            local pole = GameObject {
+                                texture = 'poles',
+                                x = (width - 4) * TILE_SIZE, 
+                                y = (blockHeight - 1) * TILE_SIZE,
+                                width = 16, 
+                                height = 48, 
+                                frame = 5, 
+                                collidable = true, 
+                                consumable = true,
+                                hit = false, 
+                                solid = false, 
+                                -- When hit, go to next level
+                                onConsume = function (player, object)
+                                    gSounds['pickup']:play()
+                                    gStateMachine:change('play', {
+                                        score = player.score, 
+                                        width = width
+                                    })
+                                end 
+                            }
+                            
+                            local flag = GameObject {
+                                texture = 'flags',
+                                x = (width - 4) * TILE_SIZE + 8,
+                                y = (blockHeight - 1) * TILE_SIZE - 1, 
+                                width = 16, 
+                                height = 16, 
+                                frame = 4,
+                                collidable = true, 
+                                consumable = true, 
+                                solid = false, 
+                                
+                                onConsume = function (player, object)
+                                    gSounds['pickup']:play()
+                                    gStateMachine:change('play', {
+                                        score = player.score, 
+                                        width = width
+                                    })
+                                end 
+                            }
+                            table.insert(objects, pole)
+                            table.insert(objects, flag)
+                        end 
+                    end
+                }
+            table.insert(objects, lockObj)
+            lockSpawned = true 
+            end 
         end
     end
 

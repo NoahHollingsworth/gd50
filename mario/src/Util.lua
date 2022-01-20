@@ -11,6 +11,21 @@
 ]]
 
 --[[
+    Utility function for slicing tables, a la Python.
+
+    https://stackoverflow.com/questions/24821045/does-lua-have-something-like-pythons-slice
+]]
+function table.slice(tbl, first, last, step)
+    local sliced = {}
+  
+    for i = first or 1, last or #tbl, step or 1 do
+      sliced[#sliced+1] = tbl[i]
+    end
+  
+    return sliced
+end
+
+--[[
     Given an "atlas" (a texture with multiple sprites), as well as a
     width and a height for the tiles therein, split the texture into
     all of the quads by simply dividing it evenly.
@@ -62,6 +77,20 @@ function GenerateTileSets(quads, setsX, setsY, sizeX, sizeY)
     return tilesets
 end
 
+function GenerateQuadsFlags(atlas)
+    local x = 96
+    local y = 0
+
+    local counter = 1
+    local quads = {}
+    for i = 0, 4 do
+        quads[counter] = love.graphics.newQuad(x, y, 16, 16, atlas:getDimensions())
+        counter = counter + 1
+        y = y + 16
+    end
+        
+    return quads
+end
 --[[
     Recursive table printing function.
     https://coronalabs.com/blog/2014/09/02/tutorial-printing-table-contents/
