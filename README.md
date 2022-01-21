@@ -54,3 +54,15 @@ Projects completed for Harvard's [CS50 Introduction to Game Development](https:/
 
 ### Project 
 * [Match 3](https://github.com/NoahHollingsworth/gd50/tree/main/match)
+
+## Lecture 4: Super Mario Bros
+
+### Topics 
+* Tile Maps
+* 2D Animation
+* Procedural Level Generation
+* Platformer Physics
+* Basic AI
+* Powerups
+### Project 
+* [Mario](https://github.com/NoahHollingsworth/gd50/tree/main/mario)
