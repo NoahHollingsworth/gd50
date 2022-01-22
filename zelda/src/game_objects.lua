@@ -22,9 +22,27 @@ GAME_OBJECT_DEFS = {
             ['pressed'] = {
                 frame = 1
             }
-        }
+        },
+        consumable = false
     },
     ['pot'] = {
         -- TODO
+    },
+    ['heart'] = {
+        type = 'heart',
+        texture = 'hearts',
+        frame = 5,
+        width = 8, 
+        height = 8, 
+        solid = false, 
+        defaultState = 'whole', 
+        states = {
+            ['whole'] = {
+                frame = 5
+            }
+        },
+        consumable = true,
+        scaleX = 0.5, 
+        scaleY = 0.5
     }
 }

@@ -38,6 +38,9 @@ function Entity:init(def)
     self.flashTimer = 0
 
     self.dead = false
+
+    -- will this entity spawn a heart when killed
+    self.spawnHeart = math.random(1) == 1
 end
 
 function Entity:createAnimations(animations)
@@ -66,6 +69,10 @@ function Entity:damage(dmg)
     self.health = self.health - dmg
 end
 
+function Entity:heal(heal)
+    self.health = self.health + heal
+end
+
 function Entity:goInvulnerable(duration)
     self.invulnerable = true
     self.invulnerableDuration = duration
@@ -78,6 +85,10 @@ end
 function Entity:changeAnimation(name)
     self.currentAnimation = self.animations[name]
 end
+
+function Entity:dropHeart()
+    
+end 
 
 function Entity:update(dt)
     if self.invulnerable then
