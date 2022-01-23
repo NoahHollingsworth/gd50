@@ -23,7 +23,9 @@ function PlayState:init()
         health = 6,
 
         -- rendering and collision offset for spaced sprites
-        offsetY = 5
+        offsetY = 5, 
+
+        type = 'player'
     }
 
     self.dungeon = Dungeon(self.player)
@@ -32,7 +34,9 @@ function PlayState:init()
     self.player.stateMachine = StateMachine {
         ['walk'] = function() return PlayerWalkState(self.player, self.dungeon) end,
         ['idle'] = function() return PlayerIdleState(self.player) end,
-        ['swing-sword'] = function() return PlayerSwingSwordState(self.player, self.dungeon) end
+        ['swing-sword'] = function() return PlayerSwingSwordState(self.player, self.dungeon) end,
+        ['pickup'] = function() return PlayerPickupState(self.player, self.dungeon) end, 
+        ['carry'] = function() return PlayerCarryState(self.player, self.dungeon) end
     }
     self.player:changeState('idle')
 end

@@ -39,7 +39,7 @@ end
 
 function GameObject:collides(target)
     return not (target.x > self.x + self.width or self.x > target.x + target.width or
-            target.y > self.y + self.height or self.y > target.y + target.height)
+            target.y > self.y + self.height or self.y > target.y + target.height + 0.5)
 end
  
 function GameObject:update(dt)
@@ -50,4 +50,7 @@ function GameObject:render(adjacentOffsetX, adjacentOffsetY)
     love.graphics.draw(gTextures[self.texture], gFrames[self.texture][self.states[self.state].frame or self.frame],
         self.x + adjacentOffsetX + (self.width*(1 - self.scaleX)), self.y + adjacentOffsetY + (self.height*(1 - self.scaleX)), 
         0, self.scaleX, self.scaleY)
+    --love.graphics.setColor(1, 0, 1, 1)
+    --love.graphics.rectangle('line', self.x, self.y, self.width, self.height)
+    --love.graphics.setColor(1, 1, 1, 1)
 end

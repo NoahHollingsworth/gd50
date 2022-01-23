@@ -11,8 +11,11 @@ EntityIdleState = Class{__includes = BaseState}
 function EntityIdleState:init(entity)
     self.entity = entity
 
-    self.entity:changeAnimation('idle-' .. self.entity.direction)
-
+    if self.entity.isCarrying then 
+        self.entity:changeAnimation('idle-carry-' .. self.entity.direction)
+    else
+        self.entity:changeAnimation('idle-' .. self.entity.direction)
+    end 
     -- used for AI waiting
     self.waitDuration = 0
     self.waitTimer = 0
@@ -39,7 +42,7 @@ function EntityIdleState:render()
     love.graphics.draw(gTextures[anim.texture], gFrames[anim.texture][anim:getCurrentFrame()],
         math.floor(self.entity.x - self.entity.offsetX), math.floor(self.entity.y - self.entity.offsetY))
     
-    -- love.graphics.setColor(255, 0, 255, 255)
-    -- love.graphics.rectangle('line', self.entity.x, self.entity.y, self.entity.width, self.entity.height)
-    -- love.graphics.setColor(255, 255, 255, 255)
+    --love.graphics.setColor(1, 0, 1, 1)
+    --love.graphics.rectangle('line', self.entity.x, self.entity.y, self.entity.width, self.entity.height)
+    --love.graphics.setColor(1, 1, 1, 1)
 end

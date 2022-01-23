@@ -102,8 +102,24 @@ function Room:generateObjects()
         end
     end
 
+    local pot = GameObject(
+        GAME_OBJECT_DEFS['pot'],
+        math.random(MAP_RENDER_OFFSET_X + TILE_SIZE,
+                    VIRTUAL_WIDTH - TILE_SIZE * 2 - 16),
+        math.random(MAP_RENDER_OFFSET_Y + TILE_SIZE,
+                    VIRTUAL_HEIGHT - (VIRTUAL_HEIGHT - MAP_HEIGHT * TILE_SIZE) + MAP_RENDER_OFFSET_Y - TILE_SIZE - 16)
+    )
+    pot.onCollide = function()
+        if pot.state == 'unbroken' then 
+            pot.state = 'broken'
+        end 
+        self.player.y = self.player.y 
+        self.player.x = self.player.x 
+    end 
+
     -- add to list of objects in scene (only one switch for now)
     table.insert(self.objects, switch)
+    table.insert(self.objects, pot)
 end
 
 --[[
@@ -191,6 +207,12 @@ function Room:update(dt)
                 gStateMachine:change('game-over')
             end
         end
+
+        for k, object in pairs(self.objects) do 
+            if entity:collides(object) and object.solid == true then 
+                entity:solidCollision(object, dt)
+            end 
+        end 
     end
 
     for k, object in pairs(self.objects) do
@@ -202,7 +224,10 @@ function Room:update(dt)
             if object.consumable then 
                 object:onConsume()
                 table.remove(self.objects, k)
-            end 
+            elseif object.solid then 
+                self.player:solidCollision(object, dt)
+            end  
+        
         end
     end
 end

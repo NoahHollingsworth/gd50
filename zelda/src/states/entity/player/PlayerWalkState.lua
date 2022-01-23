@@ -34,9 +34,13 @@ function PlayerWalkState:update(dt)
         self.entity:changeState('idle')
     end
 
-    if love.keyboard.wasPressed('space') then
+    if love.keyboard.wasPressed('space') and not self.entity.isCarrying then
         self.entity:changeState('swing-sword')
     end
+
+    if love.keyboard.wasPressed('z') and not self.entity.isCarrying then 
+        self.entity:changeState('pickup')
+    end 
 
     -- perform base collision detection against walls
     EntityWalkState.update(self, dt)

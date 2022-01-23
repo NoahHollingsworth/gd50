@@ -41,6 +41,11 @@ function Entity:init(def)
 
     -- will this entity spawn a heart when killed
     self.spawnHeart = math.random(1) == 1
+
+    self.type = def.type or 'enemy'
+
+    --is the player carrying a pot
+    self.isCarrying = false 
 end
 
 function Entity:createAnimations(animations)
@@ -78,7 +83,7 @@ function Entity:goInvulnerable(duration)
     self.invulnerableDuration = duration
 end
 
-function Entity:changeState(name)
+function Entity:changeState(name, params)
     self.stateMachine:change(name)
 end
 
@@ -86,9 +91,48 @@ function Entity:changeAnimation(name)
     self.currentAnimation = self.animations[name]
 end
 
-function Entity:dropHeart()
-    
-end 
+-- stop movement when colliding with solid objects 
+-- redirect non-player entities
+function Entity:solidCollision(target, dt)
+    local directions = {'left', 'right', 'up', 'down'}
+    if self.direction == 'left' then 
+        self.x = self.x - self.walkSpeed * dt 
+        if self.x <= target.x + target.width then 
+            self.x = target.x + target.width
+        end
+        if self.type ~= 'player' then 
+            self.direction = directions[math.random(#directions)]
+            self:changeAnimation('walk-' .. tostring(self.direction))
+        end 
+    elseif self.direction == 'right' then 
+        self.x = self.x + self.walkSpeed * dt 
+        if self.x >= target.x - target.width then 
+            self.x = target.x - self.width
+        end
+        if self.type ~= 'player' then 
+            self.direction = directions[math.random(#directions)]
+            self:changeAnimation('walk-' .. tostring(self.direction))
+        end 
+    elseif self.direction == 'up' then 
+        self.y = self.y + self.walkSpeed * dt 
+        if self.y <= target.y - target.height then 
+            self.y = target.y + target.height
+        end 
+        if self.type ~= 'player' then 
+            self.direction = directions[math.random(#directions)]
+            self:changeAnimation('walk-' .. tostring(self.direction))
+        end 
+    elseif self.direction == 'down' then 
+        self.y = self.y - self.walkSpeed * dt 
+        if self.y >= target.y + target.height then 
+            self.y = target.y - target.height
+        end 
+        if self.type ~= 'player' then 
+            self.direction = directions[math.random(#directions)]
+            self:changeAnimation('walk-' .. tostring(self.direction))
+        end 
+    end 
+end
 
 function Entity:update(dt)
     if self.invulnerable then
