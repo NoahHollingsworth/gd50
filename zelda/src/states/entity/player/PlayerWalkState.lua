@@ -37,9 +37,15 @@ function PlayerWalkState:update(dt)
     if love.keyboard.wasPressed('space') and not self.entity.isCarrying then
         self.entity:changeState('swing-sword')
     end
-
+    -- pickup a pot 
     if love.keyboard.wasPressed('z') and not self.entity.isCarrying then 
         self.entity:changeState('pickup')
+    end 
+    -- throw the pot
+    if love.keyboard.wasPressed('x') and self.entity.isCarrying then 
+        self.entity.obj.thrown = true
+        self.entity.isCarrying = false 
+        self.entity:changeState('walk')
     end 
 
     -- perform base collision detection against walls

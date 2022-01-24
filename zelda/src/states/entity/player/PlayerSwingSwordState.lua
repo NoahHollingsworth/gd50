@@ -83,17 +83,7 @@ end
 
 function PlayerSwingSwordState:render()
     local anim = self.player.currentAnimation
-    --for i,v in pairs(anim) do print(i,v) end
     love.graphics.draw(gTextures[anim.texture], gFrames[anim.texture][anim:getCurrentFrame()],
         math.floor(self.player.x - self.player.offsetX), math.floor(self.player.y - self.player.offsetY))
 
-    --
-    -- debug for player and hurtbox collision rects VV
-    --
-
-    -- love.graphics.setColor(255, 0, 255, 255)
-    -- love.graphics.rectangle('line', self.player.x, self.player.y, self.player.width, self.player.height)
-    -- love.graphics.rectangle('line', self.swordHurtbox.x, self.swordHurtbox.y,
-    --     self.swordHurtbox.width, self.swordHurtbox.height)
-    -- love.graphics.setColor(255, 255, 255, 255)
 end

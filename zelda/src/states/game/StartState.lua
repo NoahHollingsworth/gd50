@@ -23,11 +23,6 @@ function StartState:render()
         VIRTUAL_WIDTH / gTextures['background']:getWidth(),
         VIRTUAL_HEIGHT / gTextures['background']:getHeight())
 
-    -- love.graphics.setFont(gFonts['gothic-medium'])
-    -- love.graphics.printf('Legend of', 0, VIRTUAL_HEIGHT / 2 - 32, VIRTUAL_WIDTH, 'center')
-
-    -- love.graphics.setFont(gFonts['gothic-large'])
-    -- love.graphics.printf('50', 0, VIRTUAL_HEIGHT / 2 - 16, VIRTUAL_WIDTH, 'center')
 
     love.graphics.setFont(gFonts['zelda'])
     love.graphics.setColor(34/255, 34/255, 34/255, 1)

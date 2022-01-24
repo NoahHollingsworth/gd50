@@ -21,28 +21,33 @@ function PlayerCarryState:update(dt)
         self.entity:changeAnimation('carry-left')
         self.entity.obj.x = self.entity.x 
         self.entity.obj.y = self.entity.y - self.entity.height / 2 - 1
+        self.entity.obj.direction = 'left'
     elseif love.keyboard.isDown('right') then
         self.entity.direction = 'right'
         self.entity:changeAnimation('carry-right')
         self.entity.obj.x = self.entity.x 
         self.entity.obj.y = self.entity.y - self.entity.height / 2 - 1
+        self.entity.obj.direction = 'right'
     elseif love.keyboard.isDown('up') then
         self.entity.direction = 'up'
         self.entity:changeAnimation('carry-up')
         self.entity.obj.x = self.entity.x 
         self.entity.obj.y = self.entity.y - self.entity.height / 2 - 1
+        self.entity.obj.direction = 'up'
     elseif love.keyboard.isDown('down') then
         self.entity.direction = 'down'
         self.entity:changeAnimation('carry-down')
         self.entity.obj.x = self.entity.x 
         self.entity.obj.y = self.entity.y - self.entity.height / 2 - 1
-        
+        self.entity.obj.direction = 'down'
     else
         self.entity:changeState('idle')
     end 
-
-    if love.keyboard.wasPressed('x') then 
-        --TODO: throw the pot 
+    -- throw the pot
+    if love.keyboard.wasPressed('x') and self.entity.isCarrying then 
+        self.entity.obj.thrown = true
+        self.entity.isCarrying = false 
+        self.entity:changeState('walk')
     end 
 
     EntityWalkState.update(self, dt)
@@ -54,7 +59,5 @@ function PlayerCarryState:render()
     love.graphics.draw(gTextures[anim.texture], 
     gFrames[anim.texture][anim:getCurrentFrame()],
     math.floor(self.entity.x - self.entity.offsetX), math.floor(self.entity.y - self.entity.offsetY))
-    --love.graphics.setColor(1, 0, 1, 1)
-    --love.graphics.rectangle('line', self.entity.x, self.entity.y, self.entity.width, self.entity.height)
-    --love.graphics.setColor(1, 1, 1, 1)
+
 end 

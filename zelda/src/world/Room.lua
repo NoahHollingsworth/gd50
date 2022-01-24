@@ -101,25 +101,26 @@ function Room:generateObjects()
             gSounds['door']:play()
         end
     end
-
-    local pot = GameObject(
-        GAME_OBJECT_DEFS['pot'],
-        math.random(MAP_RENDER_OFFSET_X + TILE_SIZE,
-                    VIRTUAL_WIDTH - TILE_SIZE * 2 - 16),
-        math.random(MAP_RENDER_OFFSET_Y + TILE_SIZE,
-                    VIRTUAL_HEIGHT - (VIRTUAL_HEIGHT - MAP_HEIGHT * TILE_SIZE) + MAP_RENDER_OFFSET_Y - TILE_SIZE - 16)
-    )
-    pot.onCollide = function()
-        if pot.state == 'unbroken' then 
-            pot.state = 'broken'
-        end 
-        self.player.y = self.player.y 
-        self.player.x = self.player.x 
-    end 
-
     -- add to list of objects in scene (only one switch for now)
     table.insert(self.objects, switch)
-    table.insert(self.objects, pot)
+    for i = 1, 3 do 
+        local pot = GameObject(
+            GAME_OBJECT_DEFS['pot'],
+            math.random(MAP_RENDER_OFFSET_X + TILE_SIZE,
+                        VIRTUAL_WIDTH - TILE_SIZE * 2 - 16),
+            math.random(MAP_RENDER_OFFSET_Y + TILE_SIZE,
+                        VIRTUAL_HEIGHT - (VIRTUAL_HEIGHT - MAP_HEIGHT * TILE_SIZE) + MAP_RENDER_OFFSET_Y - TILE_SIZE - 16)
+        )
+        --[[pot.onCollide = function()
+            if pot.state == 'unbroken' then 
+                pot.state = 'broken'
+            end 
+            --self.player.y = self.player.y 
+            --self.player.x = self.player.x 
+            
+        end ]]
+        table.insert(self.objects, pot)
+    end 
 end
 
 --[[
@@ -173,7 +174,7 @@ function Room:update(dt)
         local entity = self.entities[i]
 
         -- remove entity from the table if health is <= 0
-        if entity.health <= 0 then
+        if entity.health <= 0 and not entity.dead then
             entity.dead = true
             
         elseif not entity.dead then
@@ -182,10 +183,11 @@ function Room:update(dt)
         end
 
         if entity.dead and entity.spawnHeart then 
-            local heart = GameObject(
+            local heart = GameObject( 
                 GAME_OBJECT_DEFS['heart'],
                 entity.x, 
                 entity.y
+            
             )
             heart.onConsume = function()
                 if self.player.health < 6 then 
@@ -207,10 +209,21 @@ function Room:update(dt)
                 gStateMachine:change('game-over')
             end
         end
+        
 
         for k, object in pairs(self.objects) do 
             if entity:collides(object) and object.solid == true then 
-                entity:solidCollision(object, dt)
+                if object.thrown and entity.type ~= 'player' and not entity.dead then 
+                    entity:damage(1) 
+                    object.state = 'broken'
+                    object.throwSpeed = 0
+                    object.thrown = false 
+                    Timer.after(1, function() 
+                            table.remove(self.objects, k)
+                        end)
+                else
+                    entity:solidCollision(object, dt)
+                end 
             end 
         end 
     end
@@ -227,9 +240,9 @@ function Room:update(dt)
             elseif object.solid then 
                 self.player:solidCollision(object, dt)
             end  
-        
         end
     end
+
 end
 
 function Room:render()
@@ -255,6 +268,8 @@ function Room:render()
     for k, entity in pairs(self.entities) do
         if not entity.dead then entity:render(self.adjacentOffsetX, self.adjacentOffsetY) end
     end
+
+    
 
     -- stencil out the door arches so it looks like the player is going through
     love.graphics.stencil(function()
@@ -284,27 +299,4 @@ function Room:render()
 
     love.graphics.setStencilTest()
 
-    --
-    -- DEBUG DRAWING OF STENCIL RECTANGLES
-    --
-
-    -- love.graphics.setColor(255, 0, 0, 100)
-    
-    -- -- left
-    -- love.graphics.rectangle('fill', -TILE_SIZE - 6, MAP_RENDER_OFFSET_Y + (MAP_HEIGHT / 2) * TILE_SIZE - TILE_SIZE,
-    -- TILE_SIZE * 2 + 6, TILE_SIZE * 2)
-
-    -- -- right
-    -- love.graphics.rectangle('fill', MAP_RENDER_OFFSET_X + (MAP_WIDTH * TILE_SIZE),
-    --     MAP_RENDER_OFFSET_Y + (MAP_HEIGHT / 2) * TILE_SIZE - TILE_SIZE, TILE_SIZE * 2 + 6, TILE_SIZE * 2)
-
-    -- -- top
-    -- love.graphics.rectangle('fill', MAP_RENDER_OFFSET_X + (MAP_WIDTH / 2) * TILE_SIZE - TILE_SIZE,
-    --     -TILE_SIZE - 6, TILE_SIZE * 2, TILE_SIZE * 2 + 12)
-
-    -- --bottom
-    -- love.graphics.rectangle('fill', MAP_RENDER_OFFSET_X + (MAP_WIDTH / 2) * TILE_SIZE - TILE_SIZE,
-    --     VIRTUAL_HEIGHT - TILE_SIZE - 6, TILE_SIZE * 2, TILE_SIZE * 2 + 12)
-    
-    -- love.graphics.setColor(255, 255, 255, 255)
 end

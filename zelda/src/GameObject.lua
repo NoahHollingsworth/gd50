@@ -30,6 +30,14 @@ function GameObject:init(def, x, y)
     self.height = def.height
     self.scaleX = def.scaleX or 1 
     self.scaleY = def.scaleY or 1
+    
+    -- if the object can be thrown 
+    self.projectile = def.projectile or false 
+    self.dx = 0
+    self.dy = 0
+    self.direction = 'left'
+    self.throwSpeed = 120
+    self.thrown = false 
 
     -- default empty collision callback
     self.onCollide = function() end
@@ -43,8 +51,44 @@ function GameObject:collides(target)
 end
  
 function GameObject:update(dt)
-
+    if self.thrown then 
+        self:throw(dt)
+    end 
 end
+
+function GameObject:throw(dt)
+    self.solid = true 
+    
+    if self.direction == 'left' then 
+        self.x = self.x - self.throwSpeed * dt
+        
+        if self.x <= MAP_RENDER_OFFSET_X + TILE_SIZE then 
+            self.x = MAP_RENDER_OFFSET_X + TILE_SIZE
+        end
+    elseif self.direction == 'right' then 
+        self.x = self.x + self.throwSpeed * dt
+
+        if self.x + self.width >= VIRTUAL_WIDTH - TILE_SIZE * 2 then
+            self.x = VIRTUAL_WIDTH - TILE_SIZE * 2 - self.width
+        end
+    elseif self.direction == 'up' then 
+        self.y = self.y - self.throwSpeed * dt
+
+        if self.y <= MAP_RENDER_OFFSET_Y + TILE_SIZE - self.height / 2 then 
+            self.y = MAP_RENDER_OFFSET_Y + TILE_SIZE - self.height / 2
+        end
+    elseif self.direction == 'down' then 
+        self.y = self.y + self.throwSpeed * dt
+
+        local bottomEdge = VIRTUAL_HEIGHT - (VIRTUAL_HEIGHT - MAP_HEIGHT * TILE_SIZE) 
+            + MAP_RENDER_OFFSET_Y - TILE_SIZE
+
+        if self.y + self.height >= bottomEdge then
+            self.y = bottomEdge - self.height
+        end
+    end 
+
+end 
 
 function GameObject:render(adjacentOffsetX, adjacentOffsetY)
     love.graphics.draw(gTextures[self.texture], gFrames[self.texture][self.states[self.state].frame or self.frame],

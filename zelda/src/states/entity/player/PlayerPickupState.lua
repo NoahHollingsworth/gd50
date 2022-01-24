@@ -23,6 +23,7 @@ function PlayerPickupState:update(dt)
         for k, object in pairs(self.dungeon.currentRoom.objects) do 
             
             if object:collides(self.player) and object.type == 'pot' then
+                object.thrown = false 
                 object.solid = false 
                 self.player.isCarrying = true 
                 object.x = self.player.x 
@@ -45,7 +46,5 @@ function PlayerPickupState:render()
     love.graphics.draw(gTextures[anim.texture], 
     gFrames[anim.texture][anim:getCurrentFrame()],
     math.floor(self.player.x - self.player.offsetX), math.floor(self.player.y - self.player.offsetY))
-    --love.graphics.setColor(1, 0, 1, 1)
-    --love.graphics.rectangle('line', self.player.x, self.player.y, self.player.width, self.player.height)
-    --love.graphics.setColor(1, 1, 1, 1)
+
 end 
