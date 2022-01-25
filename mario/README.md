@@ -10,7 +10,7 @@ Implementation of additional features for the course's Super Mario Bros game.
 
 
 ## Acknowledgements
-Original code and assets provided as part of Harvard's CS50 Introduction to Game Development course, [found here](https://github.com/NoahHollingsworth/gd50/tree/main/mario).
+Original code and assets provided as part of Harvard's CS50 Introduction to Game Development course, [found here](https://cs50.harvard.edu/games/2018/projects/4/mario/).
 
 Implementation decribed in the specification made by Noah Hollingsworth (hollingsworthjh@protonmail.com).
 

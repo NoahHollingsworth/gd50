@@ -66,3 +66,15 @@ Projects completed for Harvard's [CS50 Introduction to Game Development](https:/
 * Powerups
 ### Project 
 * [Mario](https://github.com/NoahHollingsworth/gd50/tree/main/mario)
+
+## Lecture 5: Legend of Zelda
+
+### Topics 
+* Top-Down Perspective
+* Infinite Dungeon Generation
+* Hitboxes/Hurtboxes
+* Events
+* Screen Scrolling
+* Data-Driven Design
+### Project 
+* [Zelda](https://github.com/NoahHollingsworth/gd50/tree/main/zelda)
