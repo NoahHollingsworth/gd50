@@ -31,7 +31,8 @@ function Level:init()
             -- grab the body that belongs to the player
             local playerFixture = a:getUserData() == 'Player' and a or b
             local obstacleFixture = a:getUserData() == 'Obstacle' and a or b
-            
+            -- track that the player has hit something
+            self.launchMarker.collided = true 
             -- destroy the obstacle if player's combined X/Y velocity is high enough
             local velX, velY = playerFixture:getBody():getLinearVelocity()
             local sumVel = math.abs(velX) + math.abs(velY)
@@ -44,7 +45,7 @@ function Level:init()
         -- if we collided between an obstacle and an alien, as by debris falling...
         if types['Obstacle'] and types['Alien'] then
 
-            -- grab the body that belongs to the player
+            -- grab the body that belongs to the Obstacle
             local obstacleFixture = a:getUserData() == 'Obstacle' and a or b
             local alienFixture = a:getUserData() == 'Alien' and a or b
 
@@ -63,7 +64,8 @@ function Level:init()
             -- grab the bodies that belong to the player and alien
             local playerFixture = a:getUserData() == 'Player' and a or b
             local alienFixture = a:getUserData() == 'Alien' and a or b
-
+            -- track that the player has hit something
+            self.launchMarker.collided = true 
             -- destroy the alien if player is traveling fast enough
             local velX, velY = playerFixture:getBody():getLinearVelocity()
             local sumVel = math.abs(velX) + math.abs(velY)
@@ -172,19 +174,40 @@ function Level:update(dt)
 
     -- replace launch marker if original alien stopped moving
     if self.launchMarker.launched then
+        -- track player aliens to destroy after they stop rolling 
+        local toDestroy = {}
         local xPos, yPos = self.launchMarker.alien.body:getPosition()
         local xVel, yVel = self.launchMarker.alien.body:getLinearVelocity()
         
         -- if we fired our alien to the left or it's almost done rolling, respawn
         if xPos < 0 or (math.abs(xVel) + math.abs(yVel) < 1.5) then
-            self.launchMarker.alien.body:destroy()
-            self.launchMarker = AlienLaunchMarker(self.world)
-
-            -- re-initialize level if we have no more aliens
+            -- track player aliens to destroy after they stop rolling
+            table.insert(toDestroy, self.launchMarker.alien.body)
+            -- re-initialize level if we have no more enemy aliens
             if #self.aliens == 0 then
                 gStateMachine:change('start')
             end
         end
+        for k, alien in pairs(self.launchMarker.alienCopies) do
+            xPos, yPos = alien.body:getPosition()
+            xVel, yVel = alien.body:getLinearVelocity()
+            if xPos < 0 or (math.abs(xVel) + math.abs(yVel) < 1.5) then
+                -- track player aliens to destroy after they stop rolling
+                table.insert(toDestroy, alien.body)
+                -- re-initialize level if we have no more enemy aliens
+                if #self.aliens == 0 then
+                    gStateMachine:change('start')
+                end
+            end
+        end
+        -- if all player aliens have stopped rolling, reset self.launchMarker
+        if (self.launchMarker.split and #toDestroy == 3) or (not self.launchMarker.split and #toDestroy == 1) then 
+            for k, body in pairs(toDestroy) do 
+                print('destroy')
+                body:destroy()
+            end 
+            self.launchMarker = AlienLaunchMarker(self.world)
+        end 
     end
 end
 

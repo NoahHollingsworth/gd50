@@ -27,6 +27,13 @@ function AlienLaunchMarker:init(world)
 
     -- our alien we will eventually spawn
     self.alien = nil
+
+    -- additional alien copies that can spawn 
+    self.alienCopies = {}
+    -- has the alien been split into 3 
+    self.split = false 
+    -- whether the alien has collided with anything 
+    self.collided = false 
 end
 
 function AlienLaunchMarker:update(dt)
@@ -65,6 +72,17 @@ function AlienLaunchMarker:update(dt)
             self.shiftedY = math.min(self.baseY + 30, math.max(y, self.baseY - 30))
         end
     end
+    if self.launched and love.keyboard.wasPressed('space') and not self.collided and not self.split then 
+        for i = 1, 2 do 
+            local alienCopy = Alien(self.world, 'round', self.alien.body:getX(), self.alien.body:getY() - math.random(-50, 50) , 'Player')
+            alienCopy.body:setLinearVelocity(self.alien.body:getLinearVelocity())
+            -- make the alien pretty bouncy
+            alienCopy.fixture:setRestitution(0.4)
+            alienCopy.body:setAngularDamping(1)
+            table.insert(self.alienCopies, alienCopy)
+        end 
+        self.split = true 
+    end 
 end
 
 function AlienLaunchMarker:render()
@@ -104,5 +122,8 @@ function AlienLaunchMarker:render()
         love.graphics.setColor(1, 1, 1, 1)
     else
         self.alien:render()
+        for k, alien in pairs(self.alienCopies) do 
+            alien:render()
+        end 
     end
 end
